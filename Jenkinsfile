@@ -12,36 +12,33 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Shivani-1998-Devops/project-terraform-eks.git'
+                git branch: 'main', url: 'https://github.com/Shivani-1998-Devops/project-terraform-eks.git'
             }
         }
     
         stage ("terraform init") {
             steps {
-                sh ("terraform init -reconfigure") 
+                sh "terraform init -reconfigure"
             }
         }
         
         stage ("plan") {
             steps {
-                sh ('terraform plan') 
+                sh "terraform plan"
             }
         }
 
-        stage (" Action") {
+        stage ("Action") {
             steps {
                 script {
-                    switch (params.ACTION) {
-                        case 'apply':
-                            echo 'Executing Apply...'
-                            sh "terraform apply --auto-approve"
-                            break
-                        case 'destroy':
-                            echo 'Executing Destroy...'
-                            sh "terraform destroy --auto-approve"
-                            break
-                        default:
-                            error 'Unknown action'
+                    if (params.ACTION == 'apply') {
+                        echo 'Executing Apply...'
+                        sh "terraform apply --auto-approve"
+                    } else if (params.ACTION == 'destroy') {
+                        echo 'Executing Destroy...'
+                        sh "terraform destroy --auto-approve"
+                    } else {
+                        error 'Unknown action'
                     }
                 }
             }
